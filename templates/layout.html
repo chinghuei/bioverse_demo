@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <title>BioVERSE: Biomedical Vector Embedding Realighment for Semantic Engagement</title>
-  <style id="theme-style">
+
+  <style>
     :root {
       --bg-color: #1e1e2f;
       --fg-color: #f0f0f0;
@@ -28,7 +29,6 @@
       font-family: "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg-color);
       color: var(--fg-color);
-      transition: background 0.3s, color 0.3s;
     }
 
     header {
@@ -86,7 +86,7 @@
       margin-top: 1rem;
     }
 
-    textarea, input {
+    textarea, input, select {
       width: 100%;
       padding: 0.5rem;
       margin-top: 0.5rem;
@@ -126,6 +126,7 @@
     <div class="tab active" onclick="showPanel(0)">🧭 UCSC Cell Browser</div>
     <div class="tab" onclick="showPanel(1)">📊 scExplorer</div>
     <div class="tab" onclick="showPanel(2)">💬 Ask the Model</div>
+    <div class="tab" onclick="showPanel(3)">📁 Upload .h5ad</div>
   </div>
 
   <div class="panel active">
@@ -142,6 +143,16 @@
       <input id="question" placeholder="e.g., What cell types are these?" />
       <button onclick="ask()">🔎 Submit</button>
       <div id="chat">Waiting for your question...</div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="chat-box">
+      <h3>📁 Upload a .h5ad File</h3>
+      <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".h5ad" required />
+        <button type="submit">⬆️ Upload</button>
+      </form>
+      <div id="uploadStatus">No file uploaded yet.</div>
     </div>
   </div>
 
@@ -185,6 +196,17 @@
           renderChat(JSON.parse(stored));
         } catch {}
       }
+
+      document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const res = await fetch("/upload", {
+          method: "POST",
+          body: formData
+        });
+        const result = await res.text();
+        document.getElementById("uploadStatus").textContent = result;
+      });
     }
   </script>
 </body>
