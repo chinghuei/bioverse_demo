@@ -15,7 +15,14 @@ umap_df["cell_type"] = (
     adata.obs["cell_type"] if "cell_type" in adata.obs else "unknown"
 )
 
-fig = px.scatter(umap_df, x="UMAP1", y="UMAP2", color="cell_type", hover_data=["cell_id"])
+fig = px.scatter(
+    umap_df,
+    x="UMAP1",
+    y="UMAP2",
+    color="cell_type",
+    hover_data=["cell_id"],
+    custom_data=["cell_id"],
+)
 
 app.layout = html.Div([
     html.H2("scExplorer (Dash)"),
@@ -29,7 +36,18 @@ app.layout = html.Div([
 )
 def display_selected_cells(data):
     if data:
-        points = [p["customdata"][0] for p in data["points"]]
+        points = []
+        for p in data["points"]:
+            cell_id = None
+            if "customdata" in p and p["customdata"]:
+                cell_id = p["customdata"][0]
+            if cell_id is None:
+                idx = p.get("pointIndex")
+                if idx is not None and idx < len(umap_df):
+                    cell_id = umap_df.iloc[idx]["cell_id"]
+            if cell_id is not None:
+                points.append(str(cell_id))
+
         try:
             requests.post(
                 "http://localhost:5000/selection",
@@ -38,7 +56,10 @@ def display_selected_cells(data):
             )
         except Exception as e:
             print("Failed to send selection", e)
-        return html.Pre("Selected cells:\n" + "\n".join(points))
+
+        if points:
+            return html.Pre("Selected cells:\n" + "\n".join(points))
+
     return "Select cells using lasso or box tool."
 
 if __name__ == "__main__":
