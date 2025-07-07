@@ -15,6 +15,12 @@
       --border-color: #444;
     }
 
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
     body.light {
       --bg-color: #f0f0f0;
       --fg-color: #121212;
@@ -29,6 +35,9 @@
       font-family: "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg-color);
       color: var(--fg-color);
+      line-height: 1.4;
+      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     header {
@@ -41,12 +50,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      transition: background 0.3s, color 0.3s;
     }
 
     .tabs {
       display: flex;
       background: var(--box-bg);
       border-bottom: 1px solid var(--border-color);
+      overflow-x: auto;
     }
 
     .tab {
@@ -55,16 +67,23 @@
       border-right: 1px solid var(--border-color);
       background-color: var(--box-bg);
       color: var(--fg-color);
+      transition: background 0.3s;
+    }
+
+    .tab:hover {
+      background: var(--input-bg);
     }
 
     .tab.active {
       background: var(--input-bg);
       color: var(--accent);
+      border-bottom: 2px solid var(--accent);
     }
 
     .panel {
       display: none;
       padding: 1rem 2rem;
+      margin-top: 1rem;
     }
 
     .panel.active {
@@ -83,7 +102,8 @@
       background-color: var(--box-bg);
       padding: 1rem;
       border-radius: 6px;
-      margin-top: 1rem;
+      margin: 1rem auto 0;
+      max-width: 600px;
     }
 
     textarea, input, select {
@@ -106,6 +126,11 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      transition: filter 0.3s;
+    }
+
+    button:hover {
+      filter: brightness(110%);
     }
 
     #chat {
@@ -117,11 +142,12 @@
   </style>
 </head>
 <body class="dark">
-  <header>
+  <header class="container">
     🧬 Multimodal scRNA-seq Q&A Demo
     <button onclick="toggleTheme()">🌓 Toggle Theme</button>
   </header>
 
+  <div class="container">
   <div class="tabs">
     <div class="tab active" onclick="showPanel(0)">🧭 UCSC Cell Browser</div>
     <div class="tab" onclick="showPanel(1)">📊 scExplorer</div>
@@ -155,6 +181,8 @@
       <div id="uploadStatus">No file uploaded yet.</div>
     </div>
   </div>
+
+  </div><!-- /container -->
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
