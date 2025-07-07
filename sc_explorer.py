@@ -3,6 +3,7 @@ from dash import dcc, html
 import plotly.express as px
 import scanpy as sc
 import pandas as pd
+import requests
 
 adata = sc.read_h5ad("data/processed.h5ad")
 
@@ -10,7 +11,9 @@ app = dash.Dash(__name__)
 
 umap_df = pd.DataFrame(adata.obsm["X_umap"], columns=["UMAP1", "UMAP2"])
 umap_df["cell_id"] = adata.obs_names
-umap_df["cell_type"] = adata.obs["cell_type"] if "cell_type" in adata.obs else "unknown"
+umap_df["cell_type"] = (
+    adata.obs["cell_type"] if "cell_type" in adata.obs else "unknown"
+)
 
 fig = px.scatter(umap_df, x="UMAP1", y="UMAP2", color="cell_type", hover_data=["cell_id"])
 
@@ -27,6 +30,14 @@ app.layout = html.Div([
 def display_selected_cells(data):
     if data:
         points = [p["customdata"][0] for p in data["points"]]
+        try:
+            requests.post(
+                "http://localhost:5000/selection",
+                json={"cell_ids": points},
+                timeout=1,
+            )
+        except Exception as e:
+            print("Failed to send selection", e)
         return html.Pre("Selected cells:\n" + "\n".join(points))
     return "Select cells using lasso or box tool."
 

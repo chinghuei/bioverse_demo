@@ -217,6 +217,16 @@
       ).join("<hr>");
     }
 
+    async function fetchSelection() {
+      try {
+        const res = await fetch('/selection');
+        const data = await res.json();
+        document.getElementById('cell_ids').value = data.cell_ids.join('\n');
+      } catch (e) {
+        console.error('Failed to fetch selection', e);
+      }
+    }
+
     window.onload = function () {
       const stored = localStorage.getItem("chatHistory");
       if (stored) {
@@ -224,6 +234,9 @@
           renderChat(JSON.parse(stored));
         } catch {}
       }
+
+      fetchSelection();
+      setInterval(fetchSelection, 2000);
 
       document.getElementById("uploadForm").addEventListener("submit", async function (e) {
         e.preventDefault();
