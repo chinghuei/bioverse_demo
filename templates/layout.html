@@ -1,57 +1,191 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Multimodal scRNA-seq QA Demo</title>
-    <style>
-        iframe { width: 100%; height: 500px; border: none; }
-        .tabs { display: flex; margin-bottom: 1rem; }
-        .tab { padding: 0.5rem 1rem; background: #ddd; cursor: pointer; margin-right: 1rem; }
-        .tab.active { background: #bbb; }
-        .panel { display: none; }
-        .panel.active { display: block; }
-    </style>
+  <meta charset="UTF-8">
+  <title>BioVERSE: Biomedical Vector Embedding Realighment for Semantic Engagement</title>
+  <style id="theme-style">
+    :root {
+      --bg-color: #1e1e2f;
+      --fg-color: #f0f0f0;
+      --accent: #00ffa0;
+      --box-bg: #2b2b3d;
+      --input-bg: #12121d;
+      --border-color: #444;
+    }
+
+    body.light {
+      --bg-color: #f0f0f0;
+      --fg-color: #121212;
+      --accent: #007acc;
+      --box-bg: #ffffff;
+      --input-bg: #f9f9f9;
+      --border-color: #ccc;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--fg-color);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    header {
+      background: var(--input-bg);
+      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tabs {
+      display: flex;
+      background: var(--box-bg);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab {
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      border-right: 1px solid var(--border-color);
+      background-color: var(--box-bg);
+      color: var(--fg-color);
+    }
+
+    .tab.active {
+      background: var(--input-bg);
+      color: var(--accent);
+    }
+
+    .panel {
+      display: none;
+      padding: 1rem 2rem;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      border-radius: 6px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.4);
+    }
+
+    .chat-box {
+      background-color: var(--box-bg);
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+    }
+
+    textarea, input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--fg-color);
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    button {
+      background: var(--accent);
+      color: #000;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      margin-top: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #chat {
+      background: var(--input-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      margin-top: 1rem;
+    }
+  </style>
 </head>
-<body>
-    <h1>Multimodal scRNA-seq Q&A Demo</h1>
-    <div class="tabs">
-        <div class="tab active" onclick="showPanel(0)">UCSC Cell Browser</div>
-        <div class="tab" onclick="showPanel(1)">scExplorer</div>
-        <div class="tab" onclick="showPanel(2)">Ask the Model</div>
-    </div>
+<body class="dark">
+  <header>
+    🧬 Multimodal scRNA-seq Q&A Demo
+    <button onclick="toggleTheme()">🌓 Toggle Theme</button>
+  </header>
 
-    <div class="panel active">
-        <iframe src="http://localhost:8080/demo/index.html"></iframe>
-    </div>
-    <div class="panel">
-        <iframe src="http://localhost:8050"></iframe>
-    </div>
-    <div class="panel">
-        <textarea id="cell_ids" rows="4" cols="60" placeholder="Paste selected cell IDs (1 per line)"></textarea><br>
-        <input id="question" placeholder="Enter your question">
-        <button onclick="ask()">Submit</button>
-        <pre id="chat"></pre>
-    </div>
+  <div class="tabs">
+    <div class="tab active" onclick="showPanel(0)">🧭 UCSC Cell Browser</div>
+    <div class="tab" onclick="showPanel(1)">📊 scExplorer</div>
+    <div class="tab" onclick="showPanel(2)">💬 Ask the Model</div>
+  </div>
 
-    <script>
-        function showPanel(index) {
-            const tabs = document.querySelectorAll('.tab');
-            const panels = document.querySelectorAll('.panel');
-            tabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
-            panels.forEach((panel, i) => panel.classList.toggle('active', i === index));
-        }
+  <div class="panel active">
+    <iframe src="http://localhost:8080/demo/index.html"></iframe>
+  </div>
+  <div class="panel">
+    <iframe src="http://localhost:8050"></iframe>
+  </div>
+  <div class="panel">
+    <div class="chat-box">
+      <label for="cell_ids">📋 Selected Cell IDs</label>
+      <textarea id="cell_ids" rows="4" placeholder="Paste selected cell IDs here..."></textarea>
+      <label for="question">💭 Your Question</label>
+      <input id="question" placeholder="e.g., What cell types are these?" />
+      <button onclick="ask()">🔎 Submit</button>
+      <div id="chat">Waiting for your question...</div>
+    </div>
+  </div>
 
-        async function ask() {
-            const ids = document.getElementById("cell_ids").value.trim().split(/\s+/);
-            const question = document.getElementById("question").value;
-            const response = await fetch("/ask", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ cell_ids: ids, question: question })
-            });
-            const data = await response.json();
-            document.getElementById("chat").textContent =
-                data.history.map(e => `Q: ${e.q}\nA: ${e.a}`).join("\n\n");
-        }
-    </script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    function showPanel(index) {
+      const tabs = document.querySelectorAll('.tab');
+      const panels = document.querySelectorAll('.panel');
+      tabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
+      panels.forEach((panel, i) => panel.classList.toggle('active', i === index));
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('light');
+    }
+
+    async function ask() {
+      const ids = document.getElementById("cell_ids").value.trim().split(/\s+/);
+      const question = document.getElementById("question").value;
+      const response = await fetch("/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cell_ids: ids, question: question })
+      });
+      const data = await response.json();
+      localStorage.setItem("chatHistory", JSON.stringify(data.history));
+      renderChat(data.history);
+    }
+
+    function renderChat(history) {
+      const chatEl = document.getElementById("chat");
+      chatEl.innerHTML = history.map(e =>
+        `<strong>Q:</strong> ${marked.parseInline(e.q)}<br><strong>A:</strong> ${marked.parse(e.a)}`
+      ).join("<hr>");
+    }
+
+    window.onload = function () {
+      const stored = localStorage.getItem("chatHistory");
+      if (stored) {
+        try {
+          renderChat(JSON.parse(stored));
+        } catch {}
+      }
+    }
+  </script>
 </body>
 </html>
