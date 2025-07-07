@@ -1,1 +1,28 @@
-<!DOCTYPE html><html><body><h2>Welcome</h2></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>scRNA-seq Q&A</title>
+</head>
+<body>
+  <h2>Ask about selected cells</h2>
+  <textarea id="cell_ids" rows="4" cols="60" placeholder="Paste selected cell IDs..."></textarea><br>
+  <input id="question" placeholder="Enter your question">
+  <button onclick="ask()">Submit</button>
+  <pre id="chat"></pre>
+
+  <script>
+    async function ask() {
+      const ids = document.getElementById("cell_ids").value.trim().split(/\\s+/);
+      const question = document.getElementById("question").value;
+      const response = await fetch("/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cell_ids: ids, question: question })
+      });
+      const data = await response.json();
+      document.getElementById("chat").textContent =
+        data.history.map(e => `Q: ${e.q}\nA: ${e.a}`).join("\\n\\n");
+    }
+  </script>
+</body>
+</html>
