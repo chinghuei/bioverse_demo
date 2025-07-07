@@ -31,4 +31,4 @@ def display_selected_cells(data):
     return "Select cells using lasso or box tool."
 
 if __name__ == "__main__":
-    app.run_server(port=8050)
+    app.run(debug=True, port=8050)
