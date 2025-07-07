@@ -139,6 +139,21 @@
       border-radius: 4px;
       margin-top: 1rem;
     }
+
+    .split {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .split iframe {
+      flex: 1;
+    }
+
+    .split .chat-box {
+      flex: 1;
+      margin-top: 0;
+    }
   </style>
 </head>
 <body class="dark">
@@ -150,25 +165,24 @@
   <div class="container">
   <div class="tabs">
     <div class="tab active" onclick="showPanel(0)">🧭 UCSC Cell Browser</div>
-    <div class="tab" onclick="showPanel(1)">📊 scExplorer</div>
-    <div class="tab" onclick="showPanel(2)">💬 Ask the Model</div>
-    <div class="tab" onclick="showPanel(3)">📁 Upload .h5ad</div>
+    <div class="tab" onclick="showPanel(1)">📊 scExplorer & 💬 Ask the Model</div>
+    <div class="tab" onclick="showPanel(2)">📁 Upload .h5ad</div>
   </div>
 
   <div class="panel active">
     <iframe src="http://localhost:8080/demo/index.html"></iframe>
   </div>
   <div class="panel">
-    <iframe src="http://localhost:8050"></iframe>
-  </div>
-  <div class="panel">
-    <div class="chat-box">
-      <label for="cell_ids">📋 Selected Cell IDs</label>
-      <textarea id="cell_ids" rows="4" placeholder="Paste selected cell IDs here..."></textarea>
-      <label for="question">💭 Your Question</label>
-      <input id="question" placeholder="e.g., What cell types are these?" />
-      <button onclick="ask()">🔎 Submit</button>
-      <div id="chat">Waiting for your question...</div>
+    <div class="split">
+      <iframe src="http://localhost:8050"></iframe>
+      <div class="chat-box">
+        <label for="cell_ids">📋 Selected Cell IDs</label>
+        <textarea id="cell_ids" rows="4" placeholder="Paste selected cell IDs here..."></textarea>
+        <label for="question">💭 Your Question</label>
+        <input id="question" placeholder="e.g., What cell types are these?" />
+        <button onclick="ask()">🔎 Submit</button>
+        <div id="chat">Waiting for your question...</div>
+      </div>
     </div>
   </div>
   <div class="panel">
