@@ -6,12 +6,18 @@ import os
 app = Flask(__name__)
 app.secret_key = "demo_secret"
 
-# === Setup upload folder ===
+# === Setup upload/processed folders ===
 UPLOAD_FOLDER = "data/uploads"
+PROCESSED_FILE = "data/processed.h5ad"
+CB_FOLDER = "data/cellbrowser"
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(CB_FOLDER, exist_ok=True)
 
 # === Load default AnnData ===
-adata = sc.read_h5ad("data/processed.h5ad")
+adata = None
+if os.path.exists(PROCESSED_FILE):
+    adata = sc.read_h5ad(PROCESSED_FILE)
 
 # === Placeholder for LLaVA-style multimodal model ===
 def run_model(selected_cells, question, history):
@@ -27,6 +33,9 @@ def ask():
     ids = data["cell_ids"]
     question = data["question"]
     history = session.get("chat", [])
+
+    if adata is None:
+        return "❌ No data loaded", 500
 
     selected = adata[adata.obs_names.isin(ids)]
     answer = run_model(selected, question, history)
@@ -61,10 +70,16 @@ def upload_file():
         sc.pp.pca(adata)
         sc.pp.neighbors(adata)
         sc.tl.umap(adata)
+        # Save processed data for downstream tools
+        adata.write(PROCESSED_FILE)
+        adata.write(os.path.join(CB_FOLDER, "adata_cb.h5ad"))
     except Exception as e:
         return f"❌ Preprocessing failed: {str(e)}", 500
 
-    return f"✅ File '{file.filename}' uploaded and preprocessed successfully!"
+    return (
+        f"✅ File '{file.filename}' uploaded and processed. "
+        f"Saved to '{PROCESSED_FILE}'."
+    )
 
 if __name__ == "__main__":
     app.run(debug=True, host="127.0.0.1", port=5000)
