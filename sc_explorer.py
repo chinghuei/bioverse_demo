@@ -1,6 +1,5 @@
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc, html
 import plotly.express as px
 import scanpy as sc
 import pandas as pd
@@ -33,4 +32,3 @@ def display_selected_cells(data):
 
 if __name__ == "__main__":
     app.run_server(port=8050)
-# Dash app for UMAP and metadata
