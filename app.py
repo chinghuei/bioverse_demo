@@ -6,7 +6,11 @@ import os
 app = Flask(__name__)
 app.secret_key = "demo_secret"
 
-# Load AnnData (assuming it’s preprocessed with UMAP)
+# === Setup upload folder ===
+UPLOAD_FOLDER = "data/uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# === Load default AnnData ===
 adata = sc.read_h5ad("data/processed.h5ad")
 
 # === Placeholder for LLaVA-style multimodal model ===
@@ -32,6 +36,35 @@ def ask():
 
     return jsonify({"answer": answer, "history": history})
 
+@app.route("/upload", methods=["POST"])
+def upload_file():
+    if 'file' not in request.files:
+        return "❌ No file part in the request", 400
+    file = request.files['file']
+    if file.filename == '':
+        return "❌ No selected file", 400
+    if not file.filename.endswith(".h5ad"):
+        return "❌ Only .h5ad files are supported", 400
+
+    save_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(save_path)
+
+    # Load and preprocess the new file
+    global adata
+    adata = sc.read_h5ad(save_path)
+
+    try:
+        # Basic preprocessing for visualization
+        sc.pp.normalize_total(adata)
+        sc.pp.log1p(adata)
+        sc.pp.highly_variable_genes(adata, n_top_genes=2000, subset=True)
+        sc.pp.pca(adata)
+        sc.pp.neighbors(adata)
+        sc.tl.umap(adata)
+    except Exception as e:
+        return f"❌ Preprocessing failed: {str(e)}", 500
+
+    return f"✅ File '{file.filename}' uploaded and preprocessed successfully!"
+
 if __name__ == "__main__":
     app.run(debug=True, host="127.0.0.1", port=5000)
-# Flask app (placeholder content)
