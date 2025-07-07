@@ -1,1 +1,58 @@
-<!DOCTYPE html><html><body><h1>Tabbed Demo</h1></body></html>
+# === templates/layout.html ===
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Multimodal scRNA-seq QA Demo</title>
+    <style>
+        iframe { width: 100%; height: 500px; border: none; }
+        .tabs { display: flex; margin-bottom: 1rem; }
+        .tab { padding: 0.5rem 1rem; background: #ddd; cursor: pointer; margin-right: 1rem; }
+        .tab.active { background: #bbb; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+    </style>
+</head>
+<body>
+    <h1>Multimodal scRNA-seq Q&A Demo</h1>
+    <div class="tabs">
+        <div class="tab active" onclick="showPanel(0)">UCSC Cell Browser</div>
+        <div class="tab" onclick="showPanel(1)">scExplorer</div>
+        <div class="tab" onclick="showPanel(2)">Ask the Model</div>
+    </div>
+
+    <div class="panel active">
+        <iframe src="http://localhost:8080/demo/index.html"></iframe>
+    </div>
+    <div class="panel">
+        <iframe src="http://localhost:8050"></iframe>
+    </div>
+    <div class="panel">
+        <textarea id="cell_ids" rows="4" cols="60" placeholder="Paste selected cell IDs (1 per line)"></textarea><br>
+        <input id="question" placeholder="Enter your question">
+        <button onclick="ask()">Submit</button>
+        <pre id="chat"></pre>
+    </div>
+
+    <script>
+        function showPanel(index) {
+            const tabs = document.querySelectorAll('.tab');
+            const panels = document.querySelectorAll('.panel');
+            tabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
+            panels.forEach((panel, i) => panel.classList.toggle('active', i === index));
+        }
+
+        async function ask() {
+            const ids = document.getElementById("cell_ids").value.trim().split(/\s+/);
+            const question = document.getElementById("question").value;
+            const response = await fetch("/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ cell_ids: ids, question: question })
+            });
+            const data = await response.json();
+            document.getElementById("chat").textContent =
+                data.history.map(e => `Q: ${e.q}\nA: ${e.a}`).join("\n\n");
+        }
+    </script>
+</body>
+</html>
