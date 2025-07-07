@@ -21,7 +21,24 @@ if os.path.exists(PROCESSED_FILE):
 
 # === Placeholder for LLaVA-style multimodal model ===
 def run_model(selected_cells, question, history):
-    return f"(Placeholder) You asked: '{question}' about {len(selected_cells)} selected cells."
+    return (
+        f"(Placeholder) You asked: '{question}' about "
+        f"{len(selected_cells)} selected cells."
+    )
+
+# Store cell selections coming from visualization tools
+current_selection = []
+
+
+@app.route("/selection", methods=["GET", "POST"])
+def selection():
+    """Store or retrieve the currently selected cell IDs."""
+    global current_selection
+    if request.method == "POST":
+        data = request.get_json() or {}
+        current_selection = data.get("cell_ids", [])
+        return "ok"
+    return jsonify({"cell_ids": current_selection})
 
 @app.route("/")
 def index():
