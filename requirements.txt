@@ -1,0 +1,7 @@
+flask
+dash
+scanpy
+plotly
+anndata
+numpy
+pandas
