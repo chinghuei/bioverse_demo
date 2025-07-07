@@ -17,5 +17,10 @@ adata.write("data/processed.h5ad")
 adata.write("data/cellbrowser/adata_cb.h5ad")
 
 # After this, run:
-#   cbBuild --matrix data/cellbrowser/adata_cb.h5ad --name demo
+#   # Step 1: Convert .h5ad to Cell Browser format
+#   cbImportScanpy -i data/cellbrowser/adata_cb.h5ad -o data/cellbrowser/demo
+#
+#   # Step 2: Build the Cell Browser AND serve it locally on port 8080
+#   cbBuild -i data/cellbrowser/demo/cellbrowser.conf -o data/cellbrowser/ -p 8080
+
 # convert .h5ad for UCSC Cell Browser and scExplorer
