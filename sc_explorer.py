@@ -25,7 +25,7 @@ fig = px.scatter(
 )
 
 app.layout = html.Div([
-    html.H2("scExplorer (Dash)"),
+    html.H2("scRNA-seq Explorer"),
     dcc.Graph(id="umap", figure=fig),
     html.Div(id="selected-cells")
 ])
@@ -50,7 +50,7 @@ def display_selected_cells(data):
 
         try:
             requests.post(
-                "http://localhost:5000/selection",
+                "http://127.0.0.1:5000/selection",
                 json={"cell_ids": points},
                 timeout=1,
             )

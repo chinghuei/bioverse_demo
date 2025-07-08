@@ -92,7 +92,7 @@
 
     iframe {
       width: 100%;
-      height: 600px;
+      height: 80vh;
       border: none;
       border-radius: 6px;
       box-shadow: 0 0 12px rgba(0,0,0,0.4);
@@ -147,7 +147,7 @@
     }
 
     .split iframe {
-      flex: 1;
+      flex: 3;
     }
 
     .split .chat-box {
@@ -165,16 +165,16 @@
   <div class="container">
   <div class="tabs">
     <div class="tab active" onclick="showPanel(0)">🧭 UCSC Cell Browser</div>
-    <div class="tab" onclick="showPanel(1)">📊 scExplorer & 💬 Ask the Model</div>
+    <div class="tab" onclick="showPanel(1)">📊 scExplorer & 💬 Ask Granite.Biomed</div>
     <div class="tab" onclick="showPanel(2)">📁 Upload .h5ad</div>
   </div>
 
   <div class="panel active">
-    <iframe src="http://localhost:8080/demo/index.html"></iframe>
+    <iframe src="http://127.0.0.1:8080/demo/index.html"></iframe>
   </div>
   <div class="panel">
     <div class="split">
-      <iframe src="http://localhost:8050"></iframe>
+      <iframe src="http://127.0.0.1:8050"></iframe>
       <div class="chat-box">
         <label for="cell_ids">📋 Selected Cell IDs</label>
         <textarea id="cell_ids" rows="4" placeholder="Paste selected cell IDs here..."></textarea>
