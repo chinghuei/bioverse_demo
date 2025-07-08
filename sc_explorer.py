@@ -23,10 +23,16 @@ fig = px.scatter(
     hover_data=["cell_id"],
     custom_data=["cell_id"],
 )
+fig.update_layout(xaxis_scaleanchor="y")
 
 app.layout = html.Div([
     html.H2("scRNA-seq Explorer"),
-    dcc.Graph(id="umap", figure=fig),
+    dcc.Graph(
+        id="umap",
+        figure=fig,
+        style={"height": "80vh", "width": "100%"},
+        config={"responsive": True},
+    ),
     html.Div(id="selected-cells")
 ])
 

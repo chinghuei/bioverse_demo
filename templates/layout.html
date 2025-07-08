@@ -147,7 +147,7 @@
     }
 
     .split iframe {
-      flex: 3;
+      flex: 4;
     }
 
     .split .chat-box {
@@ -156,7 +156,7 @@
     }
   </style>
 </head>
-<body class="dark">
+<body class="light">
   <header class="container">
     🧬 Multimodal scRNA-seq Q&A Demo
     <button onclick="toggleTheme()">🌓 Toggle Theme</button>
@@ -164,15 +164,12 @@
 
   <div class="container">
   <div class="tabs">
-    <div class="tab active" onclick="showPanel(0)">🧭 UCSC Cell Browser</div>
-    <div class="tab" onclick="showPanel(1)">📊 scExplorer & 💬 Ask Granite.Biomed</div>
+    <div class="tab active" onclick="showPanel(0)">📊 scExplorer & 💬 Ask Granite.Biomed</div>
+    <div class="tab" onclick="showPanel(1)">🧭 UCSC Cell Browser</div>
     <div class="tab" onclick="showPanel(2)">📁 Upload .h5ad</div>
   </div>
 
   <div class="panel active">
-    <iframe src="http://127.0.0.1:8080/demo/index.html"></iframe>
-  </div>
-  <div class="panel">
     <div class="split">
       <iframe src="http://127.0.0.1:8050"></iframe>
       <div class="chat-box">
@@ -184,6 +181,9 @@
         <div id="chat">Waiting for your question...</div>
       </div>
     </div>
+  </div>
+  <div class="panel">
+    <iframe src="http://127.0.0.1:8080/demo/index.html"></iframe>
   </div>
   <div class="panel">
     <div class="chat-box">
