@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, session, render_template
 import scanpy as sc
 import anndata
 import os
+from data.bio_llm import load_models, answer_question
 
 app = Flask(__name__)
 app.secret_key = "demo_secret"
@@ -19,12 +20,21 @@ adata = None
 if os.path.exists(PROCESSED_FILE):
     adata = sc.read_h5ad(PROCESSED_FILE)
 
-# === Placeholder for LLaVA-style multimodal model ===
+# Load multimodal models for inference
+try:
+    MODELS = load_models()
+except Exception as e:
+    MODELS = None
+    print(f"Failed to load models: {e}")
+
+# === Predict cell types using the loaded models ===
 def run_model(selected_cells, question, history):
-    return (
-        f"(Placeholder) You asked: '{question}' about "
-        f"{len(selected_cells)} selected cells."
-    )
+    if MODELS is None:
+        return "Model not available"
+    predictions = answer_question(selected_cells, question, MODELS)
+    if len(predictions) == 1:
+        return predictions[0]
+    return "\n".join(predictions)
 
 # Store cell selections coming from visualization tools
 current_selection = []
